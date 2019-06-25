@@ -21,17 +21,24 @@ class Vod extends V4Curl {
         ];
     }
 
-    public function getPlayAuthToken(array $config = []) 
+    public function getPlayAuthToken(array $config = [], string $version = "v1") 
     {
-        $url = $this->getRequestUrl("GetPlayInfo", $config);
-
-        $m = parse_url($url);
-        return $m["query"];
+        switch ($version) {
+        case "v1":
+            $token = ["Version" => $version];
+            $token["GetPlayInfoToken"] = parse_url($this->getRequestUrl("GetPlayInfo", $config))["query"];
+            return base64_encode(json_encode($token));
+        case "v0":
+            $url = $this->getRequestUrl("GetPlayInfo", $config);
+            $m = parse_url($url);
+            return $m["query"];
+        default:
+            $token = ["Version" => $version];
+            $token["GetPlayInfoToken"] = parse_url($this->getRequestUrl("GetPlayInfo", $config))["query"];
+            return base64_encode(json_encode($token));
+        }
     }
 
-    /*
-     * Version:
-    * */
     public function getUploadAuthToken(string $space, string $version = "v1")
     {
         $token = ["Version" => $version];
@@ -77,7 +84,7 @@ class Vod extends V4Curl {
             'config' => [
                 'query' => [
                     'Action' => 'ApplyUpload',
-                    'Version' => '2019-03-05',
+                    'Version' => '2018-01-01',
                 ],
             ]
         ],
@@ -87,7 +94,7 @@ class Vod extends V4Curl {
             'config' => [
                 'query' => [
                     'Action' => 'CommitUpload',
-                    'Version' => '2019-03-05',
+                    'Version' => '2018-01-01',
                 ],
             ]
         ],
